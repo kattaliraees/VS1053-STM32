@@ -30,24 +30,24 @@ endif
 
 # Add inputs and outputs from these tool invocations to the build variables 
 EXECUTABLES += \
-vs1053-demo.elf \
+VS1053-STM32.elf \
 
 SIZE_OUTPUT += \
 default.size.stdout \
 
 OBJDUMP_LIST += \
-vs1053-demo.list \
+VS1053-STM32.list \
 
 OBJCOPY_BIN += \
-vs1053-demo.bin \
+VS1053-STM32.bin \
 
 
 # All Target
-all: vs1053-demo.elf secondary-outputs
+all: VS1053-STM32.elf secondary-outputs
 
 # Tool invocations
-vs1053-demo.elf: $(OBJS) $(USER_OBJS) /Users/apple/STM32CubeIDE/workspace_1.4.0/vs1053-demo/STM32F446RETX_FLASH.ld
-	arm-none-eabi-gcc -o "vs1053-demo.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"/Users/apple/STM32CubeIDE/workspace_1.4.0/vs1053-demo/STM32F446RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="vs1053-demo.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+VS1053-STM32.elf: $(OBJS) $(USER_OBJS) /Users/apple/Desktop/VS1053-STM32/STM32F446RETX_FLASH.ld
+	arm-none-eabi-gcc -o "VS1053-STM32.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"/Users/apple/Desktop/VS1053-STM32/STM32F446RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="VS1053-STM32.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
@@ -56,13 +56,13 @@ default.size.stdout: $(EXECUTABLES)
 	@echo 'Finished building: $@'
 	@echo ' '
 
-vs1053-demo.list: $(EXECUTABLES)
-	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "vs1053-demo.list"
+VS1053-STM32.list: $(EXECUTABLES)
+	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "VS1053-STM32.list"
 	@echo 'Finished building: $@'
 	@echo ' '
 
-vs1053-demo.bin: $(EXECUTABLES)
-	arm-none-eabi-objcopy  -O binary $(EXECUTABLES) "vs1053-demo.bin"
+VS1053-STM32.bin: $(EXECUTABLES)
+	arm-none-eabi-objcopy  -O binary $(EXECUTABLES) "VS1053-STM32.bin"
 	@echo 'Finished building: $@'
 	@echo ' '
 
