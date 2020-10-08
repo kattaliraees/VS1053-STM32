@@ -61,24 +61,25 @@ static void MX_SPI2_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-
-void WriteSci(uint8_t addr, uint16_t data) {
+//For writing data to VS10xx registers at addr
+void vs1053_write_sci(uint8_t addr, uint16_t data) {
 
 	uint8_t d = 2;
 
 	while(!HAL_GPIO_ReadPin(VS1053_DREQ_GPIO_Port, VS1053_DREQ_Pin)); //Wait until DREQ is high
 
-	HAL_GPIO_WritePin(VS1053_CS_GPIO_Port, VS1053_CS_Pin, 0); //Activate xCS (Chip select)
+	HAL_GPIO_WritePin(VS1053_CS_GPIO_Port, VS1053_CS_Pin, 0); //Activate CS (Chip select, Active Low)
 	HAL_SPI_Transmit(&hspi2, &d, 1, 50); //Write command code
 	HAL_SPI_Transmit(&hspi2, &addr, 1, 50); //SCI Register number
 	d = ((uint8_t)(data >> 8) & 0xFF);
 	HAL_SPI_Transmit(&hspi2, &d, 1, 50); //LSB
 	d = ((uint8_t)(data & 0xFF));
 	HAL_SPI_Transmit(&hspi2, &d, 1, 50); //LSB
-	HAL_GPIO_WritePin(VS1053_CS_GPIO_Port, VS1053_CS_Pin, 1); //De-Activate xCS (Chip select off)
+	HAL_GPIO_WritePin(VS1053_CS_GPIO_Port, VS1053_CS_Pin, 1); //De-Activate CS (Chip select, Active Low)
 }
 
-uint16_t ReadSci(uint8_t addr) {
+//For reading VS10xx register at addr
+uint16_t vs1053_read_sci(uint8_t addr) {
 
 	uint16_t res;
 
@@ -89,19 +90,21 @@ uint16_t ReadSci(uint8_t addr) {
 	while(!HAL_GPIO_ReadPin(VS1053_DREQ_GPIO_Port, VS1053_DREQ_Pin)); //Wait until DREQ is high
 
 
-	HAL_GPIO_WritePin(VS1053_CS_GPIO_Port, VS1053_CS_Pin, 0); //Activate xCS (Chip select)
+	HAL_GPIO_WritePin(VS1053_CS_GPIO_Port, VS1053_CS_Pin, 0); //Activate CS (Chip select, Active Low)
 	HAL_SPI_Transmit(&hspi2, &d, 1, 50); //Read command code
 	HAL_SPI_Transmit(&hspi2, &addr, 1, 50); //SCI Register number
 	HAL_SPI_Receive(&hspi2, &r, 1, 50);
 	res = ((uint16_t)(r << 8)) & 0xFF00;
 	HAL_SPI_Receive(&hspi2, &r, 1, 50);
 	res |= ((uint16_t)r & 0x00FF);
-	HAL_GPIO_WritePin(VS1053_CS_GPIO_Port, VS1053_CS_Pin, 1); //De-Activate xCS (Chip select off)
+	HAL_GPIO_WritePin(VS1053_CS_GPIO_Port, VS1053_CS_Pin, 1); //De-Activate CS (Chip select, Active Low)
 
 	return res;
 }
 
-int WriteSdi(uint8_t *data, uint8_t bytes){
+
+//Sending MP3 raw bytes. Max 32 bytes at time without checking DREQ each time
+int vs1053_write_sdi(uint8_t *data, uint8_t bytes){
 
 
 	if(bytes > 32) {
@@ -111,10 +114,10 @@ int WriteSdi(uint8_t *data, uint8_t bytes){
 	while(!HAL_GPIO_ReadPin(VS1053_DREQ_GPIO_Port, VS1053_DREQ_Pin));
 
 
-	HAL_GPIO_WritePin(VS1053_DCS_GPIO_Port, VS1053_DCS_Pin, 0); //De-Activate xCS (Chip select off)
+	HAL_GPIO_WritePin(VS1053_DCS_GPIO_Port, VS1053_DCS_Pin, 0); //De-Activate DCS (Active Low)
 
 
-	HAL_SPI_Transmit(&hspi2, data, bytes, 50); //Read command code
+	HAL_SPI_Transmit(&hspi2, data, bytes, 50);
 	data++;
 
 	HAL_GPIO_WritePin(VS1053_DCS_GPIO_Port, VS1053_DCS_Pin, 1);
@@ -155,25 +158,26 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
 
+  //VS1053 init
   HAL_GPIO_WritePin(VS1053_CS_GPIO_Port, VS1053_CS_Pin, 1); // cs_high();  //MP3_XCS, Init Control Select to deselected
   HAL_GPIO_WritePin(VS1053_DCS_GPIO_Port, VS1053_DCS_Pin, 1); //dcs_high(); //MP3_XDCS, Init Data Select to deselected
   HAL_GPIO_WritePin(VS1053_RST_GPIO_Port, VS1053_RST_Pin, 0); //digitalWrite(MP3_RESET, LOW); //Put VS1053 into hardware reset
-
   HAL_Delay(5);
-
   HAL_GPIO_WritePin(VS1053_RST_GPIO_Port, VS1053_RST_Pin, 1);
+  /////
 
-  uint16_t data = ReadSci(SCI_MODE);
+  uint16_t data = vs1053_read_sci(SCI_MODE);
 
   if(data != (SM_LINE1 | SM_SDINEW)) {
 
-	  WriteSci(SCI_MODE, (SM_LINE1 | SM_SDINEW));
+	  vs1053_write_sci(SCI_MODE, (SM_LINE1 | SM_SDINEW));
   }
 
+  //Sending test mp3 data
   int j = 0;
   for(int i = outputfile_mp3_len; i > 32; i = i-32) {
 
-	  WriteSdi(&outputfile_mp3[j], 32);
+	  vs1053_write_sdi(&outputfile_mp3[j], 32);
 	  j = j+32;
 
   }

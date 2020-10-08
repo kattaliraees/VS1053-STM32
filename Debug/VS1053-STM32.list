@@ -39,11 +39,11 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING
  17 .debug_line   00005d1f  00000000  00000000  00054823  2**0
                   CONTENTS, READONLY, DEBUGGING
- 18 .debug_str    000c34ca  00000000  00000000  0005a542  2**0
+ 18 .debug_str    000c34e2  00000000  00000000  0005a542  2**0
                   CONTENTS, READONLY, DEBUGGING
- 19 .comment      0000007b  00000000  00000000  0011da0c  2**0
+ 19 .comment      0000007b  00000000  00000000  0011da24  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  000018f8  00000000  00000000  0011da88  2**2
+ 20 .debug_frame  000018f8  00000000  00000000  0011daa0  2**2
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -353,13 +353,13 @@ Disassembly of section .text:
  8000500:	4770      	bx	lr
  8000502:	bf00      	nop
 
-08000504 <WriteSci>:
+08000504 <vs1053_write_sci>:
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-
-void WriteSci(uint8_t addr, uint16_t data) {
+//For writing data to VS10xx registers at addr
+void vs1053_write_sci(uint8_t addr, uint16_t data) {
  8000504:	b580      	push	{r7, lr}
  8000506:	b084      	sub	sp, #16
  8000508:	af00      	add	r7, sp, #0
@@ -376,28 +376,28 @@ void WriteSci(uint8_t addr, uint16_t data) {
 	while(!HAL_GPIO_ReadPin(VS1053_DREQ_GPIO_Port, VS1053_DREQ_Pin)); //Wait until DREQ is high
  8000518:	bf00      	nop
  800051a:	f44f 7180 	mov.w	r1, #256	; 0x100
- 800051e:	481c      	ldr	r0, [pc, #112]	; (8000590 <WriteSci+0x8c>)
+ 800051e:	481c      	ldr	r0, [pc, #112]	; (8000590 <vs1053_write_sci+0x8c>)
  8000520:	f000 fe68 	bl	80011f4 <HAL_GPIO_ReadPin>
  8000524:	4603      	mov	r3, r0
  8000526:	2b00      	cmp	r3, #0
- 8000528:	d0f7      	beq.n	800051a <WriteSci+0x16>
+ 8000528:	d0f7      	beq.n	800051a <vs1053_write_sci+0x16>
 
-	HAL_GPIO_WritePin(VS1053_CS_GPIO_Port, VS1053_CS_Pin, 0); //Activate xCS (Chip select)
+	HAL_GPIO_WritePin(VS1053_CS_GPIO_Port, VS1053_CS_Pin, 0); //Activate CS (Chip select, Active Low)
  800052a:	2200      	movs	r2, #0
  800052c:	f44f 4180 	mov.w	r1, #16384	; 0x4000
- 8000530:	4818      	ldr	r0, [pc, #96]	; (8000594 <WriteSci+0x90>)
+ 8000530:	4818      	ldr	r0, [pc, #96]	; (8000594 <vs1053_write_sci+0x90>)
  8000532:	f000 fe77 	bl	8001224 <HAL_GPIO_WritePin>
 	HAL_SPI_Transmit(&hspi2, &d, 1, 50); //Write command code
  8000536:	f107 010f 	add.w	r1, r7, #15
  800053a:	2332      	movs	r3, #50	; 0x32
  800053c:	2201      	movs	r2, #1
- 800053e:	4816      	ldr	r0, [pc, #88]	; (8000598 <WriteSci+0x94>)
+ 800053e:	4816      	ldr	r0, [pc, #88]	; (8000598 <vs1053_write_sci+0x94>)
  8000540:	f001 fbce 	bl	8001ce0 <HAL_SPI_Transmit>
 	HAL_SPI_Transmit(&hspi2, &addr, 1, 50); //SCI Register number
  8000544:	1df9      	adds	r1, r7, #7
  8000546:	2332      	movs	r3, #50	; 0x32
  8000548:	2201      	movs	r2, #1
- 800054a:	4813      	ldr	r0, [pc, #76]	; (8000598 <WriteSci+0x94>)
+ 800054a:	4813      	ldr	r0, [pc, #76]	; (8000598 <vs1053_write_sci+0x94>)
  800054c:	f001 fbc8 	bl	8001ce0 <HAL_SPI_Transmit>
 	d = ((uint8_t)(data >> 8) & 0xFF);
  8000550:	88bb      	ldrh	r3, [r7, #4]
@@ -409,7 +409,7 @@ void WriteSci(uint8_t addr, uint16_t data) {
  800055a:	f107 010f 	add.w	r1, r7, #15
  800055e:	2332      	movs	r3, #50	; 0x32
  8000560:	2201      	movs	r2, #1
- 8000562:	480d      	ldr	r0, [pc, #52]	; (8000598 <WriteSci+0x94>)
+ 8000562:	480d      	ldr	r0, [pc, #52]	; (8000598 <vs1053_write_sci+0x94>)
  8000564:	f001 fbbc 	bl	8001ce0 <HAL_SPI_Transmit>
 	d = ((uint8_t)(data & 0xFF));
  8000568:	88bb      	ldrh	r3, [r7, #4]
@@ -419,12 +419,12 @@ void WriteSci(uint8_t addr, uint16_t data) {
  800056e:	f107 010f 	add.w	r1, r7, #15
  8000572:	2332      	movs	r3, #50	; 0x32
  8000574:	2201      	movs	r2, #1
- 8000576:	4808      	ldr	r0, [pc, #32]	; (8000598 <WriteSci+0x94>)
+ 8000576:	4808      	ldr	r0, [pc, #32]	; (8000598 <vs1053_write_sci+0x94>)
  8000578:	f001 fbb2 	bl	8001ce0 <HAL_SPI_Transmit>
-	HAL_GPIO_WritePin(VS1053_CS_GPIO_Port, VS1053_CS_Pin, 1); //De-Activate xCS (Chip select off)
+	HAL_GPIO_WritePin(VS1053_CS_GPIO_Port, VS1053_CS_Pin, 1); //De-Activate CS (Chip select, Active Low)
  800057c:	2201      	movs	r2, #1
  800057e:	f44f 4180 	mov.w	r1, #16384	; 0x4000
- 8000582:	4804      	ldr	r0, [pc, #16]	; (8000594 <WriteSci+0x90>)
+ 8000582:	4804      	ldr	r0, [pc, #16]	; (8000594 <vs1053_write_sci+0x90>)
  8000584:	f000 fe4e 	bl	8001224 <HAL_GPIO_WritePin>
 }
  8000588:	bf00      	nop
@@ -435,9 +435,10 @@ void WriteSci(uint8_t addr, uint16_t data) {
  8000594:	40020400 	.word	0x40020400
  8000598:	2000c05c 	.word	0x2000c05c
 
-0800059c <ReadSci>:
+0800059c <vs1053_read_sci>:
 
-uint16_t ReadSci(uint8_t addr) {
+//For reading VS10xx register at addr
+uint16_t vs1053_read_sci(uint8_t addr) {
  800059c:	b580      	push	{r7, lr}
  800059e:	b084      	sub	sp, #16
  80005a0:	af00      	add	r7, sp, #0
@@ -455,35 +456,35 @@ uint16_t ReadSci(uint8_t addr) {
 	while(!HAL_GPIO_ReadPin(VS1053_DREQ_GPIO_Port, VS1053_DREQ_Pin)); //Wait until DREQ is high
  80005aa:	bf00      	nop
  80005ac:	f44f 7180 	mov.w	r1, #256	; 0x100
- 80005b0:	481d      	ldr	r0, [pc, #116]	; (8000628 <ReadSci+0x8c>)
+ 80005b0:	481d      	ldr	r0, [pc, #116]	; (8000628 <vs1053_read_sci+0x8c>)
  80005b2:	f000 fe1f 	bl	80011f4 <HAL_GPIO_ReadPin>
  80005b6:	4603      	mov	r3, r0
  80005b8:	2b00      	cmp	r3, #0
- 80005ba:	d0f7      	beq.n	80005ac <ReadSci+0x10>
+ 80005ba:	d0f7      	beq.n	80005ac <vs1053_read_sci+0x10>
 
 
-	HAL_GPIO_WritePin(VS1053_CS_GPIO_Port, VS1053_CS_Pin, 0); //Activate xCS (Chip select)
+	HAL_GPIO_WritePin(VS1053_CS_GPIO_Port, VS1053_CS_Pin, 0); //Activate CS (Chip select, Active Low)
  80005bc:	2200      	movs	r2, #0
  80005be:	f44f 4180 	mov.w	r1, #16384	; 0x4000
- 80005c2:	481a      	ldr	r0, [pc, #104]	; (800062c <ReadSci+0x90>)
+ 80005c2:	481a      	ldr	r0, [pc, #104]	; (800062c <vs1053_read_sci+0x90>)
  80005c4:	f000 fe2e 	bl	8001224 <HAL_GPIO_WritePin>
 	HAL_SPI_Transmit(&hspi2, &d, 1, 50); //Read command code
  80005c8:	f107 010c 	add.w	r1, r7, #12
  80005cc:	2332      	movs	r3, #50	; 0x32
  80005ce:	2201      	movs	r2, #1
- 80005d0:	4817      	ldr	r0, [pc, #92]	; (8000630 <ReadSci+0x94>)
+ 80005d0:	4817      	ldr	r0, [pc, #92]	; (8000630 <vs1053_read_sci+0x94>)
  80005d2:	f001 fb85 	bl	8001ce0 <HAL_SPI_Transmit>
 	HAL_SPI_Transmit(&hspi2, &addr, 1, 50); //SCI Register number
  80005d6:	1df9      	adds	r1, r7, #7
  80005d8:	2332      	movs	r3, #50	; 0x32
  80005da:	2201      	movs	r2, #1
- 80005dc:	4814      	ldr	r0, [pc, #80]	; (8000630 <ReadSci+0x94>)
+ 80005dc:	4814      	ldr	r0, [pc, #80]	; (8000630 <vs1053_read_sci+0x94>)
  80005de:	f001 fb7f 	bl	8001ce0 <HAL_SPI_Transmit>
 	HAL_SPI_Receive(&hspi2, &r, 1, 50);
  80005e2:	f107 010d 	add.w	r1, r7, #13
  80005e6:	2332      	movs	r3, #50	; 0x32
  80005e8:	2201      	movs	r2, #1
- 80005ea:	4811      	ldr	r0, [pc, #68]	; (8000630 <ReadSci+0x94>)
+ 80005ea:	4811      	ldr	r0, [pc, #68]	; (8000630 <vs1053_read_sci+0x94>)
  80005ec:	f001 fcac 	bl	8001f48 <HAL_SPI_Receive>
 	res = ((uint16_t)(r << 8)) & 0xFF00;
  80005f0:	7b7b      	ldrb	r3, [r7, #13]
@@ -494,7 +495,7 @@ uint16_t ReadSci(uint8_t addr) {
  80005f8:	f107 010d 	add.w	r1, r7, #13
  80005fc:	2332      	movs	r3, #50	; 0x32
  80005fe:	2201      	movs	r2, #1
- 8000600:	480b      	ldr	r0, [pc, #44]	; (8000630 <ReadSci+0x94>)
+ 8000600:	480b      	ldr	r0, [pc, #44]	; (8000630 <vs1053_read_sci+0x94>)
  8000602:	f001 fca1 	bl	8001f48 <HAL_SPI_Receive>
 	res |= ((uint16_t)r & 0x00FF);
  8000606:	7b7b      	ldrb	r3, [r7, #13]
@@ -502,10 +503,10 @@ uint16_t ReadSci(uint8_t addr) {
  800060a:	89fb      	ldrh	r3, [r7, #14]
  800060c:	4313      	orrs	r3, r2
  800060e:	81fb      	strh	r3, [r7, #14]
-	HAL_GPIO_WritePin(VS1053_CS_GPIO_Port, VS1053_CS_Pin, 1); //De-Activate xCS (Chip select off)
+	HAL_GPIO_WritePin(VS1053_CS_GPIO_Port, VS1053_CS_Pin, 1); //De-Activate CS (Chip select, Active Low)
  8000610:	2201      	movs	r2, #1
  8000612:	f44f 4180 	mov.w	r1, #16384	; 0x4000
- 8000616:	4805      	ldr	r0, [pc, #20]	; (800062c <ReadSci+0x90>)
+ 8000616:	4805      	ldr	r0, [pc, #20]	; (800062c <vs1053_read_sci+0x90>)
  8000618:	f000 fe04 	bl	8001224 <HAL_GPIO_WritePin>
 
 	return res;
@@ -520,9 +521,11 @@ uint16_t ReadSci(uint8_t addr) {
  800062c:	40020400 	.word	0x40020400
  8000630:	2000c05c 	.word	0x2000c05c
 
-08000634 <WriteSdi>:
+08000634 <vs1053_write_sdi>:
 
-int WriteSdi(uint8_t *data, uint8_t bytes){
+
+//Sending MP3 raw bytes. Max 32 bytes at time without checking DREQ each time
+int vs1053_write_sdi(uint8_t *data, uint8_t bytes){
  8000634:	b580      	push	{r7, lr}
  8000636:	b082      	sub	sp, #8
  8000638:	af00      	add	r7, sp, #0
@@ -534,35 +537,35 @@ int WriteSdi(uint8_t *data, uint8_t bytes){
 	if(bytes > 32) {
  8000640:	78fb      	ldrb	r3, [r7, #3]
  8000642:	2b20      	cmp	r3, #32
- 8000644:	d902      	bls.n	800064c <WriteSdi+0x18>
+ 8000644:	d902      	bls.n	800064c <vs1053_write_sdi+0x18>
 		return -1;//Error - too many bytes to transfer
  8000646:	f04f 33ff 	mov.w	r3, #4294967295	; 0xffffffff
- 800064a:	e01f      	b.n	800068c <WriteSdi+0x58>
+ 800064a:	e01f      	b.n	800068c <vs1053_write_sdi+0x58>
 	}
 
 	while(!HAL_GPIO_ReadPin(VS1053_DREQ_GPIO_Port, VS1053_DREQ_Pin));
  800064c:	bf00      	nop
  800064e:	f44f 7180 	mov.w	r1, #256	; 0x100
- 8000652:	4810      	ldr	r0, [pc, #64]	; (8000694 <WriteSdi+0x60>)
+ 8000652:	4810      	ldr	r0, [pc, #64]	; (8000694 <vs1053_write_sdi+0x60>)
  8000654:	f000 fdce 	bl	80011f4 <HAL_GPIO_ReadPin>
  8000658:	4603      	mov	r3, r0
  800065a:	2b00      	cmp	r3, #0
- 800065c:	d0f7      	beq.n	800064e <WriteSdi+0x1a>
+ 800065c:	d0f7      	beq.n	800064e <vs1053_write_sdi+0x1a>
 
 
-	HAL_GPIO_WritePin(VS1053_DCS_GPIO_Port, VS1053_DCS_Pin, 0); //De-Activate xCS (Chip select off)
+	HAL_GPIO_WritePin(VS1053_DCS_GPIO_Port, VS1053_DCS_Pin, 0); //De-Activate DCS (Active Low)
  800065e:	2200      	movs	r2, #0
  8000660:	f44f 4100 	mov.w	r1, #32768	; 0x8000
- 8000664:	480c      	ldr	r0, [pc, #48]	; (8000698 <WriteSdi+0x64>)
+ 8000664:	480c      	ldr	r0, [pc, #48]	; (8000698 <vs1053_write_sdi+0x64>)
  8000666:	f000 fddd 	bl	8001224 <HAL_GPIO_WritePin>
 
 
-	HAL_SPI_Transmit(&hspi2, data, bytes, 50); //Read command code
+	HAL_SPI_Transmit(&hspi2, data, bytes, 50);
  800066a:	78fb      	ldrb	r3, [r7, #3]
  800066c:	b29a      	uxth	r2, r3
  800066e:	2332      	movs	r3, #50	; 0x32
  8000670:	6879      	ldr	r1, [r7, #4]
- 8000672:	480a      	ldr	r0, [pc, #40]	; (800069c <WriteSdi+0x68>)
+ 8000672:	480a      	ldr	r0, [pc, #40]	; (800069c <vs1053_write_sdi+0x68>)
  8000674:	f001 fb34 	bl	8001ce0 <HAL_SPI_Transmit>
 	data++;
  8000678:	687b      	ldr	r3, [r7, #4]
@@ -572,7 +575,7 @@ int WriteSdi(uint8_t *data, uint8_t bytes){
 	HAL_GPIO_WritePin(VS1053_DCS_GPIO_Port, VS1053_DCS_Pin, 1);
  800067e:	2201      	movs	r2, #1
  8000680:	f44f 4100 	mov.w	r1, #32768	; 0x8000
- 8000684:	4804      	ldr	r0, [pc, #16]	; (8000698 <WriteSdi+0x64>)
+ 8000684:	4804      	ldr	r0, [pc, #16]	; (8000698 <vs1053_write_sdi+0x64>)
  8000686:	f000 fdcd 	bl	8001224 <HAL_GPIO_WritePin>
 	return 0;
  800068a:	2300      	movs	r3, #0
@@ -621,6 +624,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
 
+  //VS1053 init
   HAL_GPIO_WritePin(VS1053_CS_GPIO_Port, VS1053_CS_Pin, 1); // cs_high();  //MP3_XCS, Init Control Select to deselected
  80006b6:	2201      	movs	r2, #1
  80006b8:	f44f 4180 	mov.w	r1, #16384	; 0x4000
@@ -636,20 +640,19 @@ int main(void)
  80006d0:	2102      	movs	r1, #2
  80006d2:	4818      	ldr	r0, [pc, #96]	; (8000734 <main+0x94>)
  80006d4:	f000 fda6 	bl	8001224 <HAL_GPIO_WritePin>
-
   HAL_Delay(5);
  80006d8:	2005      	movs	r0, #5
  80006da:	f000 faf1 	bl	8000cc0 <HAL_Delay>
-
   HAL_GPIO_WritePin(VS1053_RST_GPIO_Port, VS1053_RST_Pin, 1);
  80006de:	2201      	movs	r2, #1
  80006e0:	2102      	movs	r1, #2
  80006e2:	4814      	ldr	r0, [pc, #80]	; (8000734 <main+0x94>)
  80006e4:	f000 fd9e 	bl	8001224 <HAL_GPIO_WritePin>
+  /////
 
-  uint16_t data = ReadSci(SCI_MODE);
+  uint16_t data = vs1053_read_sci(SCI_MODE);
  80006e8:	2000      	movs	r0, #0
- 80006ea:	f7ff ff57 	bl	800059c <ReadSci>
+ 80006ea:	f7ff ff57 	bl	800059c <vs1053_read_sci>
  80006ee:	4603      	mov	r3, r0
  80006f0:	80fb      	strh	r3, [r7, #6]
 
@@ -658,12 +661,13 @@ int main(void)
  80006f4:	f5b3 4f90 	cmp.w	r3, #18432	; 0x4800
  80006f8:	d004      	beq.n	8000704 <main+0x64>
 
-	  WriteSci(SCI_MODE, (SM_LINE1 | SM_SDINEW));
+	  vs1053_write_sci(SCI_MODE, (SM_LINE1 | SM_SDINEW));
  80006fa:	f44f 4190 	mov.w	r1, #18432	; 0x4800
  80006fe:	2000      	movs	r0, #0
- 8000700:	f7ff ff00 	bl	8000504 <WriteSci>
+ 8000700:	f7ff ff00 	bl	8000504 <vs1053_write_sci>
   }
 
+  //Sending test mp3 data
   int j = 0;
  8000704:	2300      	movs	r3, #0
  8000706:	60fb      	str	r3, [r7, #12]
@@ -673,13 +677,13 @@ int main(void)
  800070c:	60bb      	str	r3, [r7, #8]
  800070e:	e00c      	b.n	800072a <main+0x8a>
 
-	  WriteSdi(&outputfile_mp3[j], 32);
+	  vs1053_write_sdi(&outputfile_mp3[j], 32);
  8000710:	68fb      	ldr	r3, [r7, #12]
  8000712:	4a0a      	ldr	r2, [pc, #40]	; (800073c <main+0x9c>)
  8000714:	4413      	add	r3, r2
  8000716:	2120      	movs	r1, #32
  8000718:	4618      	mov	r0, r3
- 800071a:	f7ff ff8b 	bl	8000634 <WriteSdi>
+ 800071a:	f7ff ff8b 	bl	8000634 <vs1053_write_sdi>
 	  j = j+32;
  800071e:	68fb      	ldr	r3, [r7, #12]
  8000720:	3320      	adds	r3, #32
