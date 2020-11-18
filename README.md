@@ -1,6 +1,17 @@
 # VS1053-STM32
 VS1053, VS1063 MP3 decoder STM32 Example code with 7 line interface (SCK, MOSI, MISO, RESET, DREQ, CS, DSC)
 
+| VS1053 Pins | Description |
+| --- | --- |
+| `SCK` | SPI Clock |
+| `SI`  | Slave in (MOSI) |
+| `SO`  | Slave out (MISO) |
+| `RESET` | VS1053 Reset pin. Active Low |
+| `DREQ` | If DREQ is high, VS1053b can take at least 32 bytes of SDI data or one SCI command. DREQ is turned low when the stream buffer is too full and for the duration of a SCI command. |
+| `CS` | SPI CS. Active low|
+| `DCS` | MP3 Data CS. Active low (only used while transferring MP3 Data) |
+
+
 Driver APIs
 ```C
 //For writing data to VS10xx registers at addr
